@@ -1,6 +1,8 @@
 import cv2
 import imutils
 import numpy as np
+import random
+import time
 
 def add_transparent_image(background, foreground, x_offset = None, y_offset = None, scalePercent = 100, rotationAngle = 0):
     # Overlay preprocessing
@@ -50,10 +52,26 @@ def add_transparent_image(background, foreground, x_offset = None, y_offset = No
     # overwrite the section of the background image that has been updated
     background[bg_y:bg_y + h, bg_x:bg_x + w] = composite
 
-background = cv2.imread('countryside.jpg')
-overlay = cv2.imread('apple.png', cv2.IMREAD_UNCHANGED) # IMREAD_UNCHANGED is to preserve the alpha channel
-
-img = background.copy()
-add_transparent_image(img, overlay, 2000, 0, 50, 57)
-cv2.imshow("", img)
-cv2.waitKey()
+if __name__ == "__main__":
+    # Parameters
+    numberOfRuns = 10
+    numberOfOverlays = 100
+    background = cv2.imread('countryside.jpg')
+    overlay = cv2.imread('apple.png', cv2.IMREAD_UNCHANGED) # IMREAD_UNCHANGED is to preserve the alpha channel
+    backgroundWidth = background.shape[1]
+    backgroundHeight = background.shape[0]
+    overlayWidth = overlay.shape[1]
+    overlayHeight = overlay.shape[0]
+    for _ in range(numberOfRuns):
+        start = time.time()
+        for _ in range(numberOfOverlays):
+            rotationAngle = random.randint(0, 359)
+            scale = random.randint(25, 200)
+            offsetX = random.randint(0, int(backgroundWidth - overlayWidth))
+            offsetY = random.randint(0, int(backgroundHeight - overlayHeight))
+            img = background.copy()
+            add_transparent_image(img, overlay, offsetX, offsetY, scale, rotationAngle)
+            #cv2.imshow("", img)
+            #cv2.waitKey()
+        end = time.time()
+        print("Run ended in", end-start)
