@@ -1,5 +1,5 @@
 import cv2
-
+import imutils
 import numpy as np
 
 def add_transparent_image(background, foreground, x_offset = None, y_offset = None, scalePercent = 100, rotationAngle = 0):
@@ -11,7 +11,7 @@ def add_transparent_image(background, foreground, x_offset = None, y_offset = No
         foreground = cv2.resize(foreground, dim, interpolation = cv2.INTER_AREA)
     
     if rotationAngle != 0:
-        pass
+        foreground = imutils.rotate_bound(foreground, rotationAngle)
     
     # Overlay application to background
     bg_h, bg_w, bg_channels = background.shape
@@ -54,6 +54,6 @@ background = cv2.imread('countryside.jpg')
 overlay = cv2.imread('apple.png', cv2.IMREAD_UNCHANGED) # IMREAD_UNCHANGED is to preserve the alpha channel
 
 img = background.copy()
-add_transparent_image(img, overlay, 2000, 0, 200)
+add_transparent_image(img, overlay, 2000, 0, 50, 57)
 cv2.imshow("", img)
 cv2.waitKey()
