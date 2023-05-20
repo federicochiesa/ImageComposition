@@ -69,7 +69,7 @@ def threadFunction(bg, fg, numberOfTimes):
 if __name__ == "__main__":
     # Parameters
     numberOfRuns = 10
-    numberOfOverlays = 100
+    numberOfOverlays = 10000
     numberOfThreads = 4
     threadArray = []
     background = cv2.imread('countryside.jpg')
@@ -87,5 +87,5 @@ if __name__ == "__main__":
         for thread in threadArray:
             thread.join()
         end = time.time()
-        print("Run ended in", end-start)
+        print("Run ended in", end - start)
         threadArray = []

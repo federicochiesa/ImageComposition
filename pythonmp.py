@@ -3,9 +3,12 @@ import imutils
 import numpy as np
 import random
 import time
+from multiprocessing import Process
 
 def add_transparent_image(background, foreground, x_offset = None, y_offset = None, scalePercent = 100, rotationAngle = 0):
     # Overlay preprocessing
+
+
     if scalePercent != 100:
         width = int(foreground.shape[1] * scalePercent / 100)
         height = int(foreground.shape[0] * scalePercent / 100)
@@ -52,10 +55,23 @@ def add_transparent_image(background, foreground, x_offset = None, y_offset = No
     # overwrite the section of the background image that has been updated
     background[bg_y:bg_y + h, bg_x:bg_x + w] = composite
 
+def threadFunction(bg, fg, numberOfTimes, backgroundWidth, backgroundHeight, overlayWidth, overlayHeight):
+    for _ in range(numberOfTimes):
+        rotationAngle = random.randint(0, 359)
+        scalePercent = random.randint(25, 200)
+        x_offset = random.randint(0, int(backgroundWidth - overlayWidth))
+        y_offset = random.randint(0, int(backgroundHeight - overlayHeight))
+        img = bg.copy()
+        add_transparent_image(img, fg, x_offset, y_offset, scalePercent, rotationAngle)
+
+
+
 if __name__ == "__main__":
     # Parameters
     numberOfRuns = 10
-    numberOfOverlays = 1000
+    numberOfOverlays = 10000
+    numberOfProcesses = 4
+    processArray = []
     background = cv2.imread('countryside.jpg')
     overlay = cv2.imread('apple.png', cv2.IMREAD_UNCHANGED) # IMREAD_UNCHANGED is to preserve the alpha channel
     backgroundWidth = background.shape[1]
@@ -63,15 +79,13 @@ if __name__ == "__main__":
     overlayWidth = overlay.shape[1]
     overlayHeight = overlay.shape[0]
     for _ in range(numberOfRuns):
+        for _ in range(numberOfProcesses):
+            processArray.append(Process(target=threadFunction, args=[background.copy(), overlay, int(numberOfOverlays / numberOfProcesses), backgroundWidth, backgroundHeight, overlayWidth, overlayHeight]))
         start = time.time()
-        for _ in range(numberOfOverlays):
-            rotationAngle = random.randint(0, 359)
-            scale = random.randint(25, 200)
-            offsetX = random.randint(0, int(backgroundWidth - overlayWidth))
-            offsetY = random.randint(0, int(backgroundHeight - overlayHeight))
-            img = background.copy()
-            add_transparent_image(img, overlay, offsetX, offsetY, scale, rotationAngle)
-            #cv2.imshow("", img)
-            #cv2.waitKey()
+        for process in processArray:
+            process.start()
+        for process in processArray:
+            process.join()
         end = time.time()
         print("Run ended in", end - start)
+        processArray = []
