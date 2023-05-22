@@ -65,11 +65,10 @@ def threadFunction(bg, fg, numberOfTimes, backgroundWidth, backgroundHeight, ove
         add_transparent_image(img, fg, x_offset, y_offset, scalePercent, rotationAngle)
 
 
-
 if __name__ == "__main__":
     # Parameters
     numberOfRuns = 10
-    numberOfOverlays = 10000
+    numberOfOverlays = 10
     numberOfProcesses = 4
     processArray = []
     background = cv2.imread('countryside.jpg')
@@ -78,6 +77,7 @@ if __name__ == "__main__":
     backgroundHeight = background.shape[0]
     overlayWidth = overlay.shape[1]
     overlayHeight = overlay.shape[0]
+    timesArray = []
     for _ in range(numberOfRuns):
         for _ in range(numberOfProcesses):
             processArray.append(Process(target=threadFunction, args=[background.copy(), overlay, int(numberOfOverlays / numberOfProcesses), backgroundWidth, backgroundHeight, overlayWidth, overlayHeight]))
@@ -87,5 +87,8 @@ if __name__ == "__main__":
         for process in processArray:
             process.join()
         end = time.time()
-        print("Run ended in", end - start)
+        timeTaken = end - start
+        timesArray.append(timeTaken)
+        print("Run ended in", timeTaken)
         processArray = []
+    print("Average time taken for", numberOfRuns, "runs:", np.mean(timesArray))

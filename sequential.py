@@ -62,6 +62,7 @@ if __name__ == "__main__":
     backgroundHeight = background.shape[0]
     overlayWidth = overlay.shape[1]
     overlayHeight = overlay.shape[0]
+    timesArray = []
     for _ in range(numberOfRuns):
         start = time.time()
         for _ in range(numberOfOverlays):
@@ -74,4 +75,7 @@ if __name__ == "__main__":
             #cv2.imshow("", img)
             #cv2.waitKey()
         end = time.time()
-        print("Run ended in", end - start)
+        timeTaken = end - start
+        timesArray.append(timeTaken)
+        print("Run ended in", timeTaken)
+    print("Average time taken for", numberOfRuns, "runs:", np.mean(timesArray))

@@ -69,7 +69,7 @@ def threadFunction(bg, fg, numberOfTimes):
 if __name__ == "__main__":
     # Parameters
     numberOfRuns = 10
-    numberOfOverlays = 10000
+    numberOfOverlays = 10
     numberOfThreads = 4
     threadArray = []
     background = cv2.imread('countryside.jpg')
@@ -78,6 +78,7 @@ if __name__ == "__main__":
     backgroundHeight = background.shape[0]
     overlayWidth = overlay.shape[1]
     overlayHeight = overlay.shape[0]
+    timesArray = []
     for _ in range(numberOfRuns):
         for _ in range(numberOfThreads):
             threadArray.append(Thread(target=threadFunction, args=[background.copy(), overlay, int(numberOfOverlays / numberOfThreads)]))
@@ -87,5 +88,8 @@ if __name__ == "__main__":
         for thread in threadArray:
             thread.join()
         end = time.time()
-        print("Run ended in", end - start)
+        timeTaken = end - start
+        timesArray.append(timeTaken)
+        print("Run ended in", timeTaken)
         threadArray = []
+    print("Average time taken for", numberOfRuns, "runs:", np.mean(timesArray))
